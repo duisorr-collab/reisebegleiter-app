@@ -1,8 +1,8 @@
-/* Service Worker des Reisebegleiters. Version 1386376c46c3
+/* Service Worker des Reisebegleiters. Version d1a029e8da8c
    App-Seite: erst Netz (damit Updates ankommen), sonst gespeicherte Fassung.
    Leaflet und Schriften: aus dem Speicher, im Hintergrund aktualisiert.
    Kartenkacheln: zuletzt angesehene Kacheln werden begrenzt aufgehoben, damit bekannte Ausschnitte offline erscheinen. */
-const APP = "app-1386376c46c3", LIB = "lib-v1", TILES = "tiles-v1", TILE_MAX = 600;
+const APP = "app-d1a029e8da8c", LIB = "lib-v1", TILES = "tiles-v1", TILE_MAX = 600;
 const SHELL = ["./", "index.html", "manifest.webmanifest", "icon-180.png", "icon-192.png", "icon-512.png"];
 self.addEventListener("install", e => { e.waitUntil(caches.open(APP).then(c => c.addAll(SHELL)).then(() => self.skipWaiting())); });
 self.addEventListener("activate", e => {

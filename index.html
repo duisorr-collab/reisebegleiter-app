@@ -441,6 +441,14 @@ details.more{margin:14px 0}details.more>summary{font-weight:700}
 .ue-row dd{margin:0;min-width:0}
 .ue-leg+.ue-leg{margin-top:3px}
 @media (max-width:560px){.ue-row{grid-template-columns:1fr}}
+.hinweisbox>summary{display:flex;flex-direction:column;gap:2px}
+.hinweisbox .hb-t{font-family:var(--display);font-size:1.15rem;font-weight:700}
+.hinweisbox .hb-list{font-weight:400;font-size:.88rem;color:var(--warn)}
+.hinweisbox[open] .hb-list{display:none}
+.hinweisbox .sec{margin-top:8px}
+.hinweisbox>summary{list-style:none;cursor:pointer}.hinweisbox>summary::-webkit-details-marker{display:none}
+.hinweisbox .hb-t::after{content:"  ▸";color:var(--muted);font-size:.9rem}
+.hinweisbox[open] .hb-t::after{content:"  ▾"}
 
 </style>
 <script defer src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
@@ -2405,14 +2413,15 @@ function buildReise(root, data) {
     ${!r.beispiel && (r.offen || []).length ? `<div class="callout warn" id="offenbox"><h3>Noch offen</h3><p>${[...new Set(r.offen.map(k => OFFEN_TEXT[k]).filter(Boolean))].map(esc).join(", ")}. Dafür gelten Platzhalter, im Zeitplan mit „Platzhalter“ markiert.</p><p><button type="button" class="btn" id="df-open2">Jetzt nachtragen</button></p></div>` : ""}
     ${reiseUebersicht(r)}
     <details class="hw datenbox" id="datenbox"><summary>${r.beispiel ? "Meine Reisedaten eingeben" : "Meine Reisedaten ändern"}${hasOverride() ? ' <span class="pf ok">gespeichert</span>' : ""}</summary><div id="df-host"></div></details>
-    <section class="sec" aria-label="Aktuelle Reisehinweise"><h2>Aktuelle Reisehinweise</h2>
-      <div class="hinweise">${warn.map(h => hinweisCard(h)).join("")}</div></section>
+    <details class="hw more hinweisbox" id="hinweisbox"${store.get("hinweise-zu", false) ? "" : " open"}><summary><span class="hb-t">Aktuelle Reisehinweise <span class="pill warn">${warn.length}</span></span><span class="hb-list">${warn.map(h => esc(h.titel)).join(" · ")}</span></summary>
+      <section class="sec" aria-label="Aktuelle Reisehinweise"><div class="hinweise">${warn.map(h => hinweisCard(h)).join("")}</div></section></details>
     <h2 class="sub" style="margin-top:26px">Hinreise</h2><div id="tl-host"></div>
     ${hasReturn(r) ? `<section class="sec" id="rueck-sec"><h2>Rückreise${exampleBadge()}</h2><div id="tl-back"></div>${srcLine(S.data.bkk.quellen, S.data.bkk.geprueft, "Die Zeiten der Rückreise sind Planungsannahmen, keine Fakten.")}</section>`
       : `<section class="sec" id="rueck-sec"><h2>Rückreise</h2><p class="note">Noch kein Rückflugtag eingetragen. Unter „Meine Reisedaten“ ergänzen, dann erscheint hier der Zeitplan.</p>${srcLine(S.data.bkk.quellen, S.data.bkk.geprueft, "Die Zeiten der Rückreise sind Planungsannahmen, keine Fakten.")}</section>`}
     <details class="hw more" id="zugbox"><summary>Zug nach Frankfurt: Tipps und Checkliste</summary>${renderBlocks(zc)}${hinweisBlock("zug", "info")}${renderBlocks(zr)}<div id="cl-zug" class="cols"></div></details>`;
   mountReise(root, r, S.data.doh.szenarien, refreshCounts);
   renderChecklists($("#cl-zug", root), ["zug"]); wireChecklists($("#cl-zug", root), refreshCounts);
+  const hb = $("#hinweisbox", root); hb.addEventListener("toggle", () => store.set("hinweise-zu", !hb.open));
   const box = $("#datenbox", root);
   let formBuilt = false;
   const openForm = () => { if (!formBuilt) { renderForm($("#df-host", root)); formBuilt = true; } };
